@@ -1,0 +1,21 @@
+:root {
+    background-size: 25;
+}
+
+
+body{
+    color: white;
+    background-color: black;
+}
+
+.plixelart{
+    image-rendering: pixelated;
+}
+
+.Character{
+    width: calc(110px * var(--pixel-size));
+    height: calc(110px * var(--pixel-size));
+    margin: 3em auto;
+    overflow: hidden;
+    position: relative;
+}
