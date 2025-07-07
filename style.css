@@ -6,7 +6,25 @@
 body{
     color: white;
     background-color: black;
+    padding: 0;
+    margin: 0;
+    overflow: auto;
 }
+
+.game-container{
+    position: relative;
+    width: 352px;
+    height: 198px;
+    margin: 0 auto;
+    outline: 3px solid white;   
+    
+    transform: scale(2) translateY(50%); /*x2 the og size + moving it to center the scale*/
+}
+
+.game-container canvas{
+    image-rendering:pixelated; 
+}
+
 
 .plixelart{
     image-rendering: pixelated;
@@ -14,7 +32,7 @@ body{
 
 .Character{
     width: calc(110px * var(--pixel-size));
-    height: calc(110px * var(--pixel-size));
+    height: calc(110px * var(--pixel-size)); 
     margin: 3em auto;
     overflow: hidden;
     position: relative;

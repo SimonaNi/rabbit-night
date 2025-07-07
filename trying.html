@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pixel Item Game</title>
+  <style>
+    body { margin: 0; overflow: hidden; background: #111; }
+    canvas { display: block; margin: auto; background: #333; }
+  </style>
+</head>
+<body>
+    
+    <nav class="navigation">
+        <button class="btn"><a href="index.html"><img src="/images/carrot.png" class="carrotbtn"><!--🡸 make it on top of the carrot idk--></a></button>
+    </nav>
+    
+  <canvas id="gameCanvas" width="640" height="480"></canvas>
+  <script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+
+    const tileSize = 32;
+    const mapWidth = canvas.width / tileSize;
+    const mapHeight = canvas.height / tileSize;
+    const player = { x: 5, y: 5, color: 'cyan', poisonCount: 0 };
+
+    const totalItems = 10;
+    let items = [];
+
+    let goodCollected = 0;
+    let gameOver = false;
+
+    function getRandomPos() {
+      return {
+        x: Math.floor(Math.random() * mapWidth),
+        y: Math.floor(Math.random() * mapHeight)
+      };
+    }
+
+    function placeItems() {
+      for (let i = 0; i < totalItems; i++) {
+        const pos = getRandomPos();
+        const type = Math.random() < 0.7 ? 'good' : 'poison';
+        items.push({ ...pos, type });
+      }
+    }
+
+    function drawTile(x, y, color) {
+      ctx.fillStyle = color;
+      ctx.fillRect(x * tileSize, y * tileSize, tileSize - 2, tileSize - 2);
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      drawTile(player.x, player.y, player.color);
+
+      for (let item of items) {
+        drawTile(item.x, item.y, item.type === 'good' ? 'lime' : 'red');
+      }
+
+      ctx.fillStyle = 'white';
+      ctx.font = '16px sans-serif';
+      ctx.fillText(`Poison: ${player.poisonCount}`, 10, 20);
+      ctx.fillText(`Good Items: ${goodCollected}/${items.filter(i => i.type === 'good').length + goodCollected}`, 10, 40);
+    }
+
+    function checkItemPickup() {
+      for (let i = 0; i < items.length; i++) {
+        if (items[i].x === player.x && items[i].y === player.y) {
+          if (items[i].type === 'good') {
+            goodCollected++;
+          } else {
+            player.poisonCount++;
+          }
+          items.splice(i, 1);
+          break;
+        }
+      }
+    }
+
+    function updateGame() {
+      if (player.poisonCount >= 3) {
+        alert("You picked up too much poison. Game over!");
+        gameOver = true;
+      } else if (items.every(item => item.type === 'poison')) {
+        alert("You collected all good items. You win!");
+        gameOver = true;
+      }
+    }
+
+    window.addEventListener('keydown', (e) => {
+      if (gameOver) return;
+
+      if (e.key === 'ArrowUp') player.y = Math.max(0, player.y - 1);
+      if (e.key === 'ArrowDown') player.y = Math.min(mapHeight - 1, player.y + 1);
+      if (e.key === 'ArrowLeft') player.x = Math.max(0, player.x - 1);
+      if (e.key === 'ArrowRight') player.x = Math.min(mapWidth - 1, player.x + 1);
+
+      checkItemPickup();
+      updateGame();
+      draw();
+    });
+
+    placeItems();
+    draw();
+  </script>
+</body>
+</html>

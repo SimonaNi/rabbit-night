@@ -1,10 +1,10 @@
-.gamescreen{
+/* .game-canvas{
     border: 0.5em solid white;
     width: 90%;
     height: auto;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%); /*to center*/
+    transform: translate(-50%, -50%); //to center
     overflow: hidden;
     position: absolute;
-}
+} */
