@@ -12,7 +12,7 @@ class Sprite{
         this.shadow = new Image();
         this.useShadow = true; //config.useShadow || false
         if(this.useShadow){
-            this.shadow.src = "/images/rabbit.png";    //change when can
+            this.shadow.src = "./images/rabbit.png";    //change when can
         }
         this.shadow.onload = () => {
             this.isShadowLoaded =true;
@@ -25,7 +25,7 @@ class Sprite{
             "idle-right": [ [0,1] ],
             "idle-up": [ [0,2] ],
             "idle-left": [ [0,3] ],
-            "walk-down": [ [1,0], [0,0], [3,0], [4,0] ], //4,? cam be 0,?
+            "walk-down": [ [1,0], [0,0], [3,0], [4,0] ], //4,_ cam be 0,_
             "walk-right": [ [1,1], [0,1], [3,1], [4,1] ],
             "walk-up": [ [1,2], [0,2], [3,2], [4,2] ],
             "walk-left": [ [1,3], [0,3], [3,3], [4,3] ]
@@ -54,7 +54,7 @@ class Sprite{
     updateAnimationProgress() {
         //downtick frame progress
         if (this.animationFrameProgress >0 ){
-            this.animationProgress -= 1;
+            this.animationFrameProgress -= 1;
             return;
         }
         //reset counter 
@@ -68,7 +68,7 @@ class Sprite{
 
     draw(ctx, cameraPerson) {
         const x = this.gameObject.x - 8 + utils.withGrid(10.5) - cameraPerson.x;
-        const y = this.gameObject.x - 18 + utils.withGrid(6) - cameraPerson.y;
+        const y = this.gameObject.y - 18 + utils.withGrid(6) - cameraPerson.y;
 
         this.isShadowLoaded && ctx.drawImage (this.shadow, x, y)
 

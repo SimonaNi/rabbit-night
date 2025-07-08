@@ -24,8 +24,8 @@ class OverworldMap{
 
 window.OverworldMap = {
     DemoMap: {      //demoroom
-        lowerSrc: "/images/maps/s_demomap.png",
-        upperSrc: "/images/maps/s_demomap.png",
+        lowerSrc: "./images/maps/s_demomap.png",
+        upperSrc: "./images/maps/s_demomap.png",
         gameObjects: {
             hero: new Characters({
             isPlayerControlled: true,
@@ -35,8 +35,8 @@ window.OverworldMap = {
         }
     },
     Pathway: {      //kitchen
-        lowerSrc: "/images/maps/s_pathmap.png",
-        upperSrc: "/images/maps/s_pathmap.png",
+        lowerSrc: "./images/maps/s_pathmap.png",
+        upperSrc: "./images/maps/s_pathmap.png",
         gameObjects: {
             hero: new Characters({
             x: utils.withGrid(5),
