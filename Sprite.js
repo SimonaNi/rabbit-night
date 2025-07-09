@@ -54,6 +54,12 @@ class Sprite{
     }
 
     draw(ctx, cameraPerson) {
+        if (ctx instanceof WebGLRenderingContext) {
+            this.drawWebGL(ctx, cameraPerson);
+            this.updateAnimationProgress();
+            return;
+        }
+
         const x = this.gameObject.x - 8 + utils.withGrid(10.5) - cameraPerson.x;
         const y = this.gameObject.y - 18 + utils.withGrid(6) - cameraPerson.y;
 
@@ -73,5 +79,28 @@ class Sprite{
         }
         
         this.updateAnimationProgress();
+    }
+
+    drawWebGL(gl, cameraPerson) {
+        // Calculate sprite position
+        const x = this.gameObject.x - 8 + utils.withGrid(10.5) - cameraPerson.x;
+        const y = this.gameObject.y - 18 + utils.withGrid(6) - cameraPerson.y;
+        const [frameX, frameY] = this.frame;
+
+        // Use a global WebGLRenderer utility to draw the sprite
+        if (this.isLoaded) {
+            WebGLRenderer.drawSprite({
+                gl,
+                image: this.image,
+                sx: frameX * 48,
+                sy: frameY * 48,
+                sw: 48,
+                sh: 48,
+                dx: x,
+                dy: y,
+                dw: 48,
+                dh: 48,
+            });
+        }
     }
 }

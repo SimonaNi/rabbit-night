@@ -18,6 +18,11 @@ class Characters extends GameObject{
         this.updatePosition();
         this.updateSprite(state);
 
+        // Check for carrot pickup after movement
+        if (this.isPlayerControlled && typeof state.map !== "undefined") {
+            state.map.checkCarrotPickup(this.x, this.y);
+        }
+
         if (this.isPlayerControlled && this.movingProgressRemaining === 0 && state.arrow){
             this.direction = state.arrow;
             this.movingProgressRemaining = 16; //the grid size is 16
