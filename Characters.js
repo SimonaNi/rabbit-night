@@ -11,7 +11,7 @@ class Characters extends GameObject{
             "down": ["y", 1],
             "left": ["x", -1],
             "right": ["x", 1],
-        }
+        };
     }
 
     update(state) {
@@ -39,8 +39,8 @@ class Characters extends GameObject{
             return;
         }
 
-        if (this.movingProgressRemaining >0){
-                this.sprite.setAnimation("walk-"+this.direction)
+        if (this.movingProgressRemaining > 0){
+                this.sprite.setAnimation("walk-" + this.direction);
         }
     }
 }

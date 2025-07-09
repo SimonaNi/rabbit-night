@@ -4,12 +4,11 @@ class GameObject{
         this.y = config.y || 0;
         this.direction = config.direction || "down";
         this.sprite = new Sprite({
-           gmaeObject: this, 
+           gameObject: this, 
            src: config.src || "./images/rabbit.png",
         });
     }
 
     update() {
-
     }
 }

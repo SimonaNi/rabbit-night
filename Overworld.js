@@ -9,7 +9,7 @@ class Overworld{
     startGameLoop(){
         const step =() => {
 
-            //clrar off the canvas
+            //clear off the canvas
             this.ctx.clearRect(0,0, this.canvas.width, this.canvas.height);
 
             //camera
@@ -24,12 +24,13 @@ class Overworld{
 
             this.map.drawLowerImage(this.ctx, cameraPerson);
 
-            //draw game objects
+            // draw upper map before game objects
+            this.map.drawUpperImage(this.ctx, cameraPerson);
+
+            //draw game objects (characters) on top of upper map
             Object.values(this.map.gameObjects).forEach(Object => {
                 Object.sprite.draw(this.ctx, cameraPerson);
             } )
-
-            this.map.drawUpperImage(this.ctx, cameraPerson);
 
             requestAnimationFrame(() =>{
                 step();
@@ -38,13 +39,28 @@ class Overworld{
         step ();
     }
 
+    waitForMapImagesLoaded(callback) {
+        //wait until both lower and upper images are loaded
+        const check = () => {
+            if (this.map.lowerImageLoaded && this.map.upperImageLoaded) {
+                callback();
+            } else {
+                setTimeout(check, 50);
+            }
+        };
+        check();
+    }
+
     init(){
         this.map = new OverworldMap(window.OverworldMap.DemoMap); 
+
+        this.gameObjects = this.map.gameObjects;
 
         this.directionInput = new DirectionInput();
         this.directionInput.init();
 
-        this.startGameLoop();
-
+        this.waitForMapImagesLoaded(() => {
+            this.startGameLoop();
+        });
     }
 }

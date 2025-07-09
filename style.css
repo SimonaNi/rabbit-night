@@ -12,9 +12,10 @@ body{
 }
 
 .game-container{
+    background-color: #451111;
     position: relative;
-    width: 352px;
-    height: 198px;
+    width: 402px;
+    height: 248px;
     margin: 0 auto;
     outline: 3px solid white;   
     
