@@ -134,7 +134,7 @@ class Overworld{
         this.directionInput = new DirectionInput();
         this.directionInput.init();
 
-        //set win/lose callbacks
+        // set win/lose callbacks
         this.map.onWin = () => this.showWinPopup();
         this.map.onLose = () => this.showLosePopup();
 

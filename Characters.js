@@ -18,14 +18,42 @@ class Characters extends GameObject{
         this.updatePosition();
         this.updateSprite(state);
 
-        // Check for carrot pickup after movement
+        //check for carrot pickup after movement
         if (this.isPlayerControlled && typeof state.map !== "undefined") {
             state.map.checkCarrotPickup(this.x, this.y);
         }
 
+        //limit movement within map 
         if (this.isPlayerControlled && this.movingProgressRemaining === 0 && state.arrow){
-            this.direction = state.arrow;
-            this.movingProgressRemaining = 16; //the grid size is 16
+            //map bounds logic
+            const map = state.map;
+            const gridSize = 16;
+            //using lowerImage size if loaded, else fallback to default
+            const mapWidthPx = map.lowerImage.naturalWidth || 402;
+            const mapHeightPx = map.lowerImage.naturalHeight || 248;
+            const minX = 0;
+            const minY = 0;
+            const maxX = mapWidthPx - gridSize;
+            const maxY = mapHeightPx - gridSize;
+
+            let nextX = this.x;
+            let nextY = this.y;
+            if (state.arrow === "up") nextY -= gridSize;
+            if (state.arrow === "down") nextY += gridSize;
+            if (state.arrow === "left") nextX -= gridSize;
+            if (state.arrow === "right") nextX += gridSize;
+
+            //clamp nextX and nextY to map bounds
+            if (
+                nextX >= minX &&
+                nextX <= maxX &&
+                nextY >= minY &&
+                nextY <= maxY
+            ) {
+                this.direction = state.arrow;
+                this.movingProgressRemaining = gridSize;
+            }
+            //else: do not move if out of bounds
         }
     }
 

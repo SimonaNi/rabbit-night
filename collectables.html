@@ -16,14 +16,32 @@
         </button>
     </nav>
 
-    <div class="collectables-container">
+    <div class="collectables-container" style="text-align: center;">
         <h1>Collectables</h1>
         <p>Here you can see the collectables you have gathered in the game.</p>
     
-        There are currently no collectables to display.
-        <!-- this is where you would dynamically list the collectables: cards/rewards, etc.-->
+        <p><i>[There are currently no collectables to display.]</i></p>
+        <!-- dynamically list the collectables: cards/rewards, etc.-->
+        <!-- it should be: you get a card for each ending ==> you unlock new map where you get a card for each ending ==> and so on, and so forth -->
+
+        <div class="ending-cards-container">
+            <div class="ending-card ending-card-flip" id="ending-card-1"><span>ending ???</span></div>
+            <div class="ending-card"><span>ending ???</span></div>
+            <div class="ending-card"><span>ending ???</span></div>
+        </div>
         
     </div>
     
+    <script>
+        //i only have the first card rn
+        document.getElementById('ending-card-1').addEventListener('click', function() {
+            if (!this.classList.contains('revealed')) {
+                this.classList.add('revealed');
+                setTimeout(() => {
+                    this.innerHTML = '<img src="./images/collection/thebitcardEnding.png" alt="Ending" />';
+                }, 250); // waiting for half flip before showing image
+            }
+        });
+    </script>
 </body>
 </html>

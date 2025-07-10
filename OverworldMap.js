@@ -6,6 +6,7 @@ class OverworldMap{
         this.lowerImageLoaded = false;
         this.lowerImage.onload = () => {
             this.lowerImageLoaded = true;
+            this.initCarrots(); // <-- only initialize carrots after image is loaded!!!
         };
 
         this.upperImage = new Image();
@@ -17,63 +18,91 @@ class OverworldMap{
 
         this.gameObjects = config.gameObjects || {};
 
-        //carrot objects (random positions)
-        this.carrotImage = new Image();
-        this.carrotImage.src = "./images/s_carrot.png";
+        // images for carrots and teeth
+        this.goodCarrotImage = new Image();
+        this.goodCarrotImage.src = "./images/carrot2.png";
+        this.toothImage = new Image();
+        this.toothImage.src = "./images/tooth.png";
+
         this.carrots = [];
-        this.initCarrots();
 
         //carrot counters
         this.goodCarrotsCollected = 0;
-        this.poisonCarrotsCollected = 0;
+        this.lives = 3;     //starting with 3 hearts
 
         //win/lose callbacks
         this.onWin = null;
         this.onLose = null;
+
+        //tooth message flag
+        this.toothMessageShown = false;
     }
 
     initCarrots() {
-        //5 healthy, 3 poison
-        const total = 8;
+        // 5 healthy, 4 poison
+        const total = 9;
         const healthy = 5;
-        const poison = 3;
-        const positions = new Set();
+        const poison = total - healthy;
+        const positions = [];
+        const minDistancePx = 100; // minimum pixel distance between items
 
-        // Get map pixel size (default fallback if not loaded)
+        //get map pixel size (default fallback if not loaded)
         const mapWidthPx = this.lowerImage.naturalWidth || 402;
         const mapHeightPx = this.lowerImage.naturalHeight || 248;
 
-        // Carrot size and grid
         const carrotSize = 16;
-        // Compute grid bounds, skipping 50px from each edge
-        const minX = Math.ceil((50) / carrotSize);
-        const maxX = Math.floor((mapWidthPx - 50) / carrotSize) - 1;
-        const minY = Math.ceil((50) / carrotSize);
-        const maxY = Math.floor((mapHeightPx - 50) / carrotSize) - 1;
+        const minX = Math.ceil((100) / carrotSize);
+        const maxX = Math.floor((mapWidthPx - 100) / carrotSize) - 1;
+        const minY = Math.ceil((100) / carrotSize);
+        const maxY = Math.floor((mapHeightPx - 100) / carrotSize) - 1;
 
-        // Random unique positions within safe area
-        while (positions.size < total) {
+        function isFarEnoughPx(x, y, arr, minDistPx) {
+            for (const pos of arr) {
+                const dx = (pos.x - x) * carrotSize;
+                const dy = (pos.y - y) * carrotSize;
+                if (Math.sqrt(dx*dx + dy*dy) < minDistPx) return false;
+            }
+            return true;
+        }
+
+        let attempts = 0;
+        while (positions.length < total && attempts < 1000) {
             const x = Math.floor(Math.random() * (maxX - minX + 1)) + minX;
             const y = Math.floor(Math.random() * (maxY - minY + 1)) + minY;
-            positions.add(`${x},${y}`);
+            if (isFarEnoughPx(x, y, positions, minDistancePx)) {
+                positions.push({ x, y });
+            }
+            attempts++;
         }
-        const posArr = Array.from(positions).map(str => {
-            const [x, y] = str.split(',').map(Number);
-            return { x, y };
-        });
+        //if not enough razdelicheni positions found, fill the rest randomly
+        while (positions.length < total) {
+            const x = Math.floor(Math.random() * (maxX - minX + 1)) + minX;
+            const y = Math.floor(Math.random() * (maxY - minY + 1)) + minY;
+            positions.push({ x, y });
+        }
+
+        this.carrots = [];
         for (let i = 0; i < healthy; i++) {
-            this.carrots.push({ ...posArr[i], type: "good" });
+            this.carrots.push({ ...positions[i], type: "good" });
         }
         for (let i = healthy; i < total; i++) {
-            this.carrots.push({ ...posArr[i], type: "poison" });
+            this.carrots.push({ ...positions[i], type: "poison" });
         }
     }
 
     checkCarrotPickup(playerX, playerY) {
-        //carrots are on a 16x16 grid
+        //carrots are on a 16x16 grid + 2px margin
         for (let i = 0; i < this.carrots.length; i++) {
             const carrot = this.carrots[i];
-            if (carrot.x * 16 === playerX && carrot.y * 16 === playerY) {
+            const carrotPx = carrot.x * 16;
+            const carrotPy = carrot.y * 16;
+            // hitbox + 2px on each side
+            if (
+                playerX >= carrotPx - 2 &&
+                playerX <= carrotPx + 16 + 2 - 1 &&
+                playerY >= carrotPy - 2 &&
+                playerY <= carrotPy + 16 + 2 - 1
+            ) {
                 if (carrot.type === "good") {
                     this.goodCarrotsCollected++;
                     this.carrots.splice(i, 1);
@@ -83,15 +112,44 @@ class OverworldMap{
                     }
                     return;
                 } else {
-                    this.poisonCarrotsCollected++;
+                    this.lives--;
                     this.carrots.splice(i, 1);
+                    //show tooth message only the first time
+                    if (!this.toothMessageShown) {
+                        this.showToothMessage();
+                        this.toothMessageShown = true;
+                    }
                     //lose condition
-                    if (this.poisonCarrotsCollected === 3 && typeof this.onLose === "function") {
+                    if (this.lives === 0 && typeof this.onLose === "function") {
                         this.onLose();
                     }
                     return;
                 }
             }
+        }
+    }
+
+    showToothMessage() {
+        let msg = document.getElementById("tooth-msg");
+        if (!msg) {
+            msg = document.createElement("div");
+            msg.id = "tooth-msg";
+            msg.style.position = "fixed";
+            msg.style.top = "30%";
+            msg.style.left = "50%";
+            msg.style.transform = "translate(-50%, -50%)";
+            msg.style.background = "rgba(0,0,0,0.85)";
+            msg.style.color = "white";
+            msg.style.fontSize = "1.5em";
+            msg.style.padding = "1em 2em";
+            msg.style.borderRadius = "1em";
+            msg.style.zIndex = "9999";
+            msg.style.textAlign = "center";
+            msg.textContent = "You found a tooth... better be more careful...";
+            document.body.appendChild(msg);
+            setTimeout(() => {
+                if (msg.parentNode) msg.parentNode.removeChild(msg);
+            }, 3500);
         }
     }
 
@@ -114,31 +172,35 @@ class OverworldMap{
             );
         }
 
-        //draw carrots on top of the map
-        if (this.carrotImage.complete && this.carrotImage.naturalWidth > 0) {
-            for (const carrot of this.carrots) {
-                const x = carrot.x * 16 + utils.withGrid(10.5) - cameraPerson.x;
-                const y = carrot.y * 16 + utils.withGrid(6) - cameraPerson.y;
-                ctx.drawImage(this.carrotImage, x, y, 16, 16);
-                //draw a colored border to distinguish poison but ill figure out a better way to do this later
-                if (carrot.type === "poison") {
-                    ctx.strokeStyle = "red";
-                    ctx.lineWidth = 2;
-                    ctx.strokeRect(x, y, 16, 16);
-                } else {
-                    ctx.strokeStyle = "lime";
-                    ctx.lineWidth = 2;
-                    ctx.strokeRect(x, y, 16, 16);
+        //draw carrots (good) and teeth (poison) on top of the map
+        for (const carrot of this.carrots) {
+            const x = carrot.x * 16 + utils.withGrid(10.5) - cameraPerson.x;
+            const y = carrot.y * 16 + utils.withGrid(6) - cameraPerson.y;
+            if (carrot.type === "poison") {
+                if (this.toothImage.complete && this.toothImage.naturalWidth > 0) {
+                    ctx.drawImage(this.toothImage, x, y, 16, 16);
+                }
+            } else {
+                if (this.goodCarrotImage.complete && this.goodCarrotImage.naturalWidth > 0) {
+                    ctx.drawImage(this.goodCarrotImage, x, y, 16, 16);
                 }
             }
         }
 
-        //draw carrot counters
+        //draw carrot counters and hearts
         ctx.save();
         ctx.font = "12px sans-serif";
         ctx.fillStyle = "white";
-        ctx.fillText(`Good carrots: ${this.goodCarrotsCollected}`, 10, 20);
-        ctx.fillText(`Poison carrots: ${this.poisonCarrotsCollected}`, 10, 40);
+        ctx.fillText(`Carrots: ${this.goodCarrotsCollected}`, 10, 20);
+
+        // draw hearts
+        ctx.font = "20px sans-serif";
+        let hearts = "";
+        for (let i = 0; i < 3; i++) {
+            hearts += i < this.lives ? "♡ " : "  ";
+        }
+        ctx.fillStyle = "red";
+        ctx.fillText(hearts.trim(), 10, 45);
         ctx.restore();
     }
 }
