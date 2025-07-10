@@ -19,10 +19,8 @@ class Sprite{
         }
         this.currentAnimation = config.currentAnimation || "idle-down";
         this.currentAnimationFrame = 0;
-
         this.animationFrameLimit = config.animationFrameLimit || 8;
         this.animationFrameProgress = this.animationFrameLimit;
-
         this.gameObject = config.gameObject;
     }
 
@@ -82,12 +80,12 @@ class Sprite{
     }
 
     drawWebGL(gl, cameraPerson) {
-        // Calculate sprite position
+        //calculate sprite position
         const x = this.gameObject.x - 8 + utils.withGrid(10.5) - cameraPerson.x;
         const y = this.gameObject.y - 18 + utils.withGrid(6) - cameraPerson.y;
         const [frameX, frameY] = this.frame;
 
-        // Use a global WebGLRenderer utility to draw the sprite
+        //use a global WebGLRenderer utility to draw the sprite
         if (this.isLoaded) {
             WebGLRenderer.drawSprite({
                 gl,
