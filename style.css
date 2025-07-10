@@ -20,7 +20,7 @@ body{
     margin: 0 auto;
     outline: 3px solid white;   
     
-    transform: scale(2) translateY(50%); /*x2 the og size + moving it to center the scale*/
+    transform: scale(2) translateY(35%); /*x2 the og size + moving it to center the scale*/
 }
 
 .game-container canvas{
